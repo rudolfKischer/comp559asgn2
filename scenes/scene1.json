@@ -1,0 +1,19 @@
+{
+    "sim_parameters":[
+        {
+            "name":"Dzhanibekov effect",
+            "dt": 0.01,
+            "gravity": [0, 0, 0],
+            "substeps": 10,
+            "check_collisions": false
+        }
+    ],
+    "bodies":[
+        {
+            "name":"thing",
+            "file_root": "data/thing",
+            "x0": [0, 3, 0],
+            "omega0": [0, 5, 0.01]
+        }
+    ]
+}

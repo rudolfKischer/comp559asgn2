@@ -1,0 +1,23 @@
+{
+    "sim_parameters":[
+        {
+            "name":"ground collision test",
+            "substeps": 1,
+            "dt": 0.01,
+            "gravity": [0, -9.8, 0],
+            "check_collisions": true
+        }
+    ],
+    "bodies":[
+        {
+            "name":"sphere",
+            "file_root": "data/sphere",
+            "x0": [0, 1.5, 0],
+            "R0": [[0, 1, 0],
+                [1, 0, 0],
+                [0, 0, 1]],
+            "v0": [0, 0, 0],
+            "omega0": [0, 0, 0]
+        }
+    ]
+}

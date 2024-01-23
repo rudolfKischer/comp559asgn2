@@ -1,0 +1,29 @@
+{
+    "sim_parameters":[
+        {
+            "name":"stack",
+            "substeps": 1,
+            "dt": 0.01,
+            "gravity": [0, -9.8, 0],
+            "mu": 2
+        }
+    ],
+    "bodies":[
+
+        {
+            "name":"Brick1",
+            "file_root": "data/brick",
+            "x0": [0, 1, 0]
+        },
+        {
+            "name":"Sphere2",
+            "file_root": "data/sphere",    
+            "x0": [0, 3, 0]
+        },
+        {
+            "name":"Brick2",
+            "file_root": "data/brick",
+            "x0": [0.1, 5, 0.2]
+        }
+    ]
+}

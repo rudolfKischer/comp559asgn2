@@ -1,0 +1,22 @@
+{
+    "sim_parameters":[
+        {
+            "name":"Friction Ground Impact",
+            "dt": 0.01,
+            "gravity": [0, -9.8, 0],
+            "mu": 2
+        }
+    ],
+    "bodies":[
+        {
+            "name":"Sphere",
+            "file_root": "data/sphere",    
+            "x0": [0, 1.5, 0],
+            "R0": [[0, 1, 0],
+                [1, 0, 0],
+                [0, 0, 1]],
+            "v0": [-1, -1, 0],
+            "omega0": [0, 0, 0]
+        }
+    ]
+}
