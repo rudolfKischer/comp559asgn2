@@ -1,4 +1,5 @@
-# TODO: YOUR NAME AND STUDENT NUMBER HERE
+# Rudolf C. Kischer
+# 260956107
 
 import numpy as np
 

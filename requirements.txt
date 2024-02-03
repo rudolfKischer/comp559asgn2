@@ -1,1 +1,4 @@
 polyscope
+sympy
+numpy
+libigl
