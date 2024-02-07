@@ -21,7 +21,7 @@ ps.set_ground_plane_height_factor(-0.2,is_relative=True)
 			
 # process argumetns from command line and setup with selected json file
 parser = argparse.ArgumentParser()
-parser.add_argument("--file", type=str, default = "scenes/scene1.json")
+parser.add_argument("--file", type=str, default = "scenes/scene2.json")
 args = parser.parse_args()
 data = json.load(open(args.file))
 rigid_body_list = []

@@ -5,15 +5,15 @@ import numpy as np
 import polyscope as ps
 import igl
 import json
+import scipy as sp
 
-def hat(u):
-  return np.array([[0, -u[2], u[1]], [u[2], 0, -u[0]], [-u[1], u[0], 0]])
+from utils import hat
 
 class RigidBody:
   def __init__(self, body_desc=None):
     if body_desc == None:
       self.name = "inertial frame"
-      self.mass = 0 # total mass as a scalar
+      self.mass = 0
       self.mass_inv = 0
       self.J0 = np.zeros((3,3)) # inertia tensor
       self.Jinv0 = np.zeros((3,3)) # inverse of inertia tensor
@@ -42,7 +42,14 @@ class RigidBody:
       self.update_display()
     # self.v = np.ones(3) # linear velocity
     # self.omega = np.ones(3) * 30
-    self.omega_dot = np.zeros(3)
+    self.omega = self.omega0.copy()
+    self.J = self.J0
+    self.Jinv = self.Jinv0
+    self.delta_V = np.zeros(6)
+
+    # TODO
+    # self.J = self.J0
+
 
   def reset(self):
     self.x = self.x0.copy()
@@ -52,6 +59,8 @@ class RigidBody:
     self.force = np.zeros(3)
     self.torque = np.zeros(3)
     # TODO: keep track of rotational inertia in the world aligned frame!
+    self.J = self.J0
+    self.Jinv = self.Jinv0
 
   def update_display(self):
     # Construct and set the homogeneous transformation matrix
@@ -75,11 +84,16 @@ class RigidBody:
     # - angular velocity
     # use the force and torque
     # torque = J * omega_dot + (omega_hat - J * omega) * omega
+    # self.v += self.delta_V[0:3]
+    # self.omega += self.delta_V[3:6]
+    self.J = self.R @ self.J0 @ self.R.T
+    self.Jinv = self.R @ self.Jinv0 @ self.R.T
 
-    omega_hat = hat(self.omega)
+
     # update linear velocity
     v_dot = h * self.mass_inv * self.force
     self.v += v_dot
+
 
 
     # update angular velocity
@@ -88,15 +102,20 @@ class RigidBody:
     # We will apply the effect of inertial forces seperately
     # this way er can account for errror , because we know that the angular velocity is not changing
     # so we can restore the magnitude of the angular velocity after the force is applied
-    omega_dot = h* self.Jinv0 @ (-np.cross(self.omega, self.J0 @ self.omega))
-    self.omega_dot = omega_dot
-    self.omega_prev = self.omega.copy()
+    omega_hat = hat(self.omega)
+
+    omega_dot = h* self.Jinv @ (self.torque - (omega_hat @ self.J @ self.omega))
+
+    # omega_dot = h* self.Jinv @ (-(omega_hat @ self.J @ self.omega))
+    # self.omega_prev = self.omega.copy()
     self.omega += omega_dot  
+
     # normalize omega and multiply by omega prev magnitude
-    self.omega = self.omega / np.linalg.norm(self.omega) * np.linalg.norm(self.omega_prev) 
+    # if np.linalg.norm(self.omega) != 0:
+        # self.omega = self.omega / np.linalg.norm(self.omega) * np.linalg.norm(self.omega_prev) 
 
     # apply torque after restoring distortions in the angular velocity
-    self.omega += h * self.Jinv0 @ self.torque
+    # self.omega += h * self.Jinv @ self.torque
 
 
     return
@@ -121,22 +140,16 @@ class RigidBody:
     self.x += h * self.v
 
     # update rotation matrix
-    r = self.omega * h
+    # r = self.omega * h
     # cap velocity above 0.0001 to avoid division by zero
-    if np.linalg.norm(r) > 0.0000001:
-      theta = np.linalg.norm(r)
-      r_hat = hat(r)
-      rodrigues = np.eye(3) + np.sin(theta) * r_hat  + (1 - np.cos(theta)) * r_hat @ r_hat
-      self.R = self.R @ rodrigues
-    self.R = self.gram_schmidt(self.R)
-
-    # U, _, Vt = np.linalg.svd(self.R)
-    # # Ensure a right-handed coordinate system
-    # if np.linalg.det(U @ Vt) < 0:
-    #     U[:, -1] *= -1  # Change the sign of the last column of U
-    # self.R = U @ Vt
-
-    # print(self.R @ self.R.T)
+    # if np.linalg.norm(r) > 0.00001:
+    # theta = np.linalg.norm(r)
+    # if theta != 0:
+    #   r_hat = hat(r)
+      # rodrigues = np.eye(3) + np.sin(theta) * r_hat  + (1 - np.cos(theta)) * r_hat @ r_hat
+      # self.R = self.R @ rodrigues
+    self.R = sp.linalg.expm(hat(self.omega) * h) @ self.R
+    # self.R = self.gram_schmidt(self.R)
 
 
     
@@ -147,36 +160,38 @@ class RigidBody:
     # omega_hat = log(R) / h
 
     # J_{t+1} = R * J_t * R^T
-    self.J0 = self.R @ self.J0 @ self.R.T
+
     
     # update inverse inertia tensor in world frame
     # Jinv_{t+1} = R * Jinv_t * R^T
-    self.Jinv0 = self.R @ self.Jinv0 @ self.R.T
+    # TODO: use j_inv for M_inv
 
-    # print(self.J0)
-    # print(self.Jinv0)
-    
-
-
-
-
-    # correct using svd
-
-
-    
-    # update inertia tensor in world frame
     return
+  
+  def generalized_mass_matrix(self):
+    A1 = self.mass * np.eye(3)
+    A2 = np.zeros((3,3))
+    A3 = np.zeros((3,3))
+    A4 = self.J
 
+    M = np.block([[A1, A2], [A3, A4]])
+    return M
+  
+  def inv_generalized_mass_matrix(self):
+    # if the mass is zero, we can't invert the matrix
+    if self.mass == 0:
+      return np.zeros((6,6))
+    M_inv = np.block([[np.eye(3) / self.mass, np.zeros((3,3))], [np.zeros((3,3)), self.Jinv]])
+    return M_inv
 
   def kinetic_energy(self):
-
-    return 0.5 * (self.v.T @ (self.mass * np.eye(3)) @ self.v) + 0.5 * self.omega.T @ self.J0 @ self.omega
+    return 0.5 * (self.v.T @ (self.mass * np.eye(3)) @ self.v) + 0.5 * self.omega.T @ self.J @ self.omega
   
   def potential_energy(self, gravity):
-    return self.mass * gravity[1] * self.x[1]
+    return self.mass * -gravity[1] * self.x[1]
   
   def linear_momentum(self):
     return self.mass * self.v
   
   def angular_momentum(self):
-    return self.J0 @ self.omega
+    return self.J @ self.omega
