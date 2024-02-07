@@ -82,16 +82,6 @@ def main_display_loop():
       psim.TextUnformatted("Total Energy = " + str(rb.kinetic_energy() + rb.potential_energy(gravity)))
       psim.TextUnformatted("Linear Momentum = " + str(rb.linear_momentum()))
       psim.TextUnformatted("Angular Momentum = " + str(rb.angular_momentum()))
-      # angular velocity
-      # psim.TextUnformatted("Angular Velocity = " + str(np.linalg.norm(rb.omega)))
-      # angular acceleration
-      # psim.TextUnformatted("Angular Acceleration = " + str(np.linalg.norm(rb.omega_dot(h))))
-      # angular momentum magnitude
-      # psim.TextUnformatted("Angular Momentum Magnitude = " + str(np.linalg.norm(rb.angular_momentum())))
-      # rotation matrix * rotation matrix transpose
-      # psim.TextUnformatted("Rotation Matrix * Rotation Matrix Transpose = \n" + str(np.dot(rb.R, rb.R.T)))
-      # rotation matrix determinant
-      # psim.TextUnformatted("Rotation Matrix Determinant = " + str(np.linalg.det(rb.R)))
     psim.TreePop()
 
   if is_running or do_step:
