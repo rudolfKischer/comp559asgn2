@@ -47,9 +47,6 @@ class RigidBody:
     self.Jinv = self.Jinv0
     self.delta_V = np.zeros(6)
 
-    # TODO
-    # self.J = self.J0
-
 
   def reset(self):
     self.x = self.x0.copy()
@@ -58,7 +55,6 @@ class RigidBody:
     self.omega = self.omega0.copy()
     self.force = np.zeros(3)
     self.torque = np.zeros(3)
-    # TODO: keep track of rotational inertia in the world aligned frame!
     self.J = self.J0
     self.Jinv = self.Jinv0
 
@@ -90,21 +86,15 @@ class RigidBody:
     # update linear velocity
     v_dot = h * self.mass_inv * self.force
     self.v += v_dot
-    omega_hat = hat(self.omega)
 
     # update angular velocity
+    omega_hat = hat(self.omega)
     omega_dot = h* self.Jinv @ (self.torque - (omega_hat @ self.J @ self.omega))
     self.omega += omega_dot  
     return
 
 
   def step_pos(self, h):	
-    # TODO: implement this function
-    # we need to update:
-    # - position
-    # - rotation matrix
-    # - inertia tensor in world frame
-    # - inverse inertia tensor in world frame
     self.x += h * self.v
     self.R = sp.linalg.expm(hat(self.omega) * h) @ self.R
     return

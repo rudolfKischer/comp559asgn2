@@ -4,6 +4,7 @@
             "name":"Body1 vs Body2 Collision Test",
             "damping": 0,
             "substeps": 1,
+            "pgs_iterations": 50,
             "dt": 0.01
         }
     ],

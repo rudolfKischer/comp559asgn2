@@ -2,3 +2,4 @@ polyscope
 sympy
 numpy
 libigl
+scipy

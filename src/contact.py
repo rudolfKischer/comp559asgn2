@@ -75,6 +75,7 @@ class Contact:
   
   
   def compute_delta_V(self, iters, mu):
+
     # delta V = M^-1 * J.T * lambda_k-1
     # where delta V is the change in velocity
     # lambda_k = lambda_k-1 - b_i' + J'_row_i  * delta V_k-1
@@ -92,10 +93,9 @@ class Contact:
     J_prime = J.copy()
     A = self.compute_effective_mass_matrix(J=J)
 
-    # print(f'A: \n{A}')
-    for i in range(J.shape[0]):
-      J_prime[i,:] = J_prime[i,:] / A[i,i]
-      b_prime[i] = b_prime[i] / A[i,i]
+    D_i = np.diag(A).reshape(-1,1)
+    J_prime = J_prime / D_i
+    b_prime = b_prime / D_i
 
     delta_V = np.zeros((12,1))
 
@@ -103,9 +103,9 @@ class Contact:
 
 
     T_cols = [T[:,i].reshape(-1,1) for i in range(3)]
-    
+    # print(f'Starting lambda: {self._lambda}')
     for k in range(iters):
-      # print(f'delta_V: \n{delta_V}')
+      prev_lambda = self._lambda.copy()
       for i in range(3):
         lambda_i_k = self._lambda[i].copy()
         lambda_i_k_1 = lambda_i_k - b_prime[i] - J_prime[i,:] @ delta_V
@@ -125,8 +125,14 @@ class Contact:
         self._lambda[i] = lambda_i_k_1
     
         delta_V += T_col_i * (lambda_i_k_1 - lambda_i_k)
+      # print(f'k: {k} delta lambda: {(self._lambda[i] - prev_lambda[i]):.2e}')
+      if np.linalg.norm(self._lambda - prev_lambda) == 0 or np.linalg.norm(self._lambda - prev_lambda) < 1e-10:
+          # print(f'k: {k} delta lambda: {(self._lambda[i] - prev_lambda[i]):.2e}')
+          break
     
-    return delta_V
+    # print(f'Ending lambda: {self._lambda}')
+    
+    return delta_V, k
   
   def generalized_mass_matrix(self):
     M1 = self.body1.generalized_mass_matrix()
@@ -141,7 +147,6 @@ class Contact:
     return M_inv
 
   def compute_effective_mass_matrix(self, J=None):
-    # TODO: implement this function
 
     # effective mass matrix
     # Mi = [m_i * I, 0;

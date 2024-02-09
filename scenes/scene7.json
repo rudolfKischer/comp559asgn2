@@ -2,9 +2,10 @@
     "sim_parameters":[
         {
             "name":"stack",
-            "substeps": 1,
+            "substeps": 3,
             "dt": 0.01,
             "gravity": [0, -9.8, 0],
+            "pgs_iterations": 100,
             "mu": 2
         }
     ],

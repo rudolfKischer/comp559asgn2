@@ -36,6 +36,7 @@ is_running = sim_params.get('is_running',False)
 check_collisions = sim_params.get('check_collisions',True)
 show_contacts = sim_params.get('show_contacts',False)
 stop_on_contact = sim_params.get('stop_on_contact',False)
+pgs_iterations = sim_params.get('pgs_iterations',30)
 
 # other setup before main loop
 collision = Collision()
@@ -43,7 +44,7 @@ elapsed = 0
 np.set_printoptions(formatter={'float_kind':"{:.2f}".format})
 
 def main_display_loop():
-  global is_running, check_collisions, show_contacts, stop_on_contact, substeps, gravity, mu, elapsed, h
+  global is_running, check_collisions, show_contacts, stop_on_contact, substeps, gravity, mu, elapsed, h, pgs_iterations
 
   # TODO: SET YOUR NAME AND STUDENT NUMBER HERE
   psim.TextUnformatted("Rudolf C. Kischer 260956107")
@@ -62,6 +63,7 @@ def main_display_loop():
   psim.TextUnformatted("Elapsed = " + str(elapsed))
   _, h = psim.SliderFloat("step size", h, v_min=0.001, v_max=0.1)
   _, substeps = psim.InputInt("substeps", substeps, step=1, step_fast=1)
+  _, pgs_iterations = psim.InputInt("pgs iterations", pgs_iterations, step=1, step_fast=1)
   if substeps < 1:
     substeps = 1; 
   _, check_collisions = psim.Checkbox("Check collisions", check_collisions )
@@ -93,7 +95,7 @@ def main_display_loop():
         rb.add_force( gravity * rb.mass )
         rb.step_vel( stepsize )
       if check_collisions and collision.check(rigid_body_list) :
-        collision.process(rigid_body_list,mu)
+        collision.process(rigid_body_list,mu, pgs_iterations)
         if stop_on_contact:
           is_running = False
       for rb in rigid_body_list:

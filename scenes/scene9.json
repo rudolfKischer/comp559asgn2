@@ -1,0 +1,52 @@
+{
+    "sim_parameters":[
+        {
+            "name":"Dynamic Interaction Scene",
+            "substeps": 4,
+            "dt": 0.01,
+            "gravity": [0, -9.8, 0],
+            "pgs_iterations": 100,
+            "mu": 0.05
+        }
+    ],
+    "bodies":[
+        {
+            "name":"Sphere1",
+            "file_root": "data/sphere",
+            "x0": [2, 10, 0],
+            "v0": [2, 0, 0],
+            "omega0": [0, 0, 5]
+        },
+        {
+            "name":"Cube1",
+            "file_root": "data/cube",
+            "x0": [0, 5, 0],
+            "R0": [[1, 0, 0],
+                   [0, 1, 0],
+                   [0, 0, 1]],
+            "v0": [0, -1, 0],
+            "omega0": [0, 3, 0]
+        },
+        {
+            "name":"Brick1",
+            "file_root": "data/brick",
+            "x0": [-2, 2, 0],
+            "v0": [1, 0, 0],
+            "omega0": [0, 0, 2]
+        },
+        {
+            "name":"Thing1",
+            "file_root": "data/thing",
+            "x0": [0, 8, 0],
+            "v0": [0, -1, 1],
+            "omega0": [2, 0, 0]
+        },
+        {
+            "name":"Sphere2",
+            "file_root": "data/sphere",
+            "x0": [-3, 12, 0],
+            "v0": [-2, 0, 0],
+            "omega0": [0, 5, 0]
+        }
+    ]
+}

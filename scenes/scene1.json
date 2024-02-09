@@ -5,6 +5,7 @@
             "dt": 0.01,
             "gravity": [0, 0, 0],
             "substeps": 10,
+            "pgs_iterations": 50,
             "check_collisions": false
         }
     ],

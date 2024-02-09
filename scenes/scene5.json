@@ -4,6 +4,7 @@
             "name":"Friction Ground Impact",
             "dt": 0.01,
             "gravity": [0, -9.8, 0],
+            "pgs_iterations": 50,
             "mu": 2
         }
     ],
