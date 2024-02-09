@@ -91,7 +91,7 @@ class Collision:
 
     contact_pairs = []
 
-    epsilon = 0.01
+    epsilon = 0.001
 
 
 

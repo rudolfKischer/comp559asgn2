@@ -2,7 +2,7 @@
     "sim_parameters":[
         {
             "name":"Brick falling on ground",
-            "substeps": 1,
+            "substeps": 2,
             "dt": 0.01,
             "gravity": [0, -9.8, 0],
             "pgs_iterations": 50,
